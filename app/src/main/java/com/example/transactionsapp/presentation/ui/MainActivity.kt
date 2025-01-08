@@ -48,8 +48,6 @@ class MainActivity : FragmentActivity() {
                 composable(LOGIN) {
                     LoginScreen(
                         authViewModel = authViewModel,
-                        context = applicationContext,
-                        biometric = biometricAuthenticator,
                         onLoginSuccess = {
                             navController.navigate(TRANSACTIONS)
                         }

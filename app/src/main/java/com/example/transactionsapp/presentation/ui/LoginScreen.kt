@@ -3,8 +3,6 @@
 package com.example.transactionsapp.presentation.ui
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.widget.ImageButton
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -23,12 +21,9 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
@@ -40,14 +35,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -58,13 +51,10 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.fragment.app.FragmentActivity
 import com.example.transactionsapp.R
 import com.example.transactionsapp.data.model.request.LoginRequest
 import com.example.transactionsapp.presentation.viewmodel.AuthViewModel
 import com.example.transactionsapp.ui.theme.TransactionsAppTheme
-import com.example.transactionsapp.utils.BiometricAuthenticator
-import kotlinx.coroutines.delay
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -72,10 +62,9 @@ import kotlinx.coroutines.delay
 fun LoginScreen(
     authViewModel: AuthViewModel,
     onLoginSuccess: () -> Unit,
-    context: Context,
-    biometric: BiometricAuthenticator
 ) {
 
+    val context = LocalContext.current
 
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -104,7 +93,6 @@ fun LoginScreen(
             modifier = Modifier.fillMaxSize(),
             color = Color.White
         ) {
-            val activity = LocalContext.current as FragmentActivity
             Scaffold(
                 topBar = {
                     TopAppBar(
@@ -207,30 +195,20 @@ fun LoginScreen(
 
                             Button(
                                 onClick = {
-
-                                    biometric.promptBiometricAuth(
-                                        title = "Login",
-                                        subTitle = "Use your fingerprint",
-                                        negativeButtonText = "Cancel",
-                                        fragmentActivity = activity,
-                                        onSuccess = {
-                                            var message = "Success"
-                                        },
-                                        onError = { _, errorString ->
-                                            var message = errorString.toString()
-                                        },
-                                        onFailed = {
-                                            var message = "Verification error"
-                                        }
+                                    if (username.isEmpty() or password.isEmpty()) {
+                                        Toast.makeText(
+                                            context,
+                                            "Please enter the username and password",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                    authViewModel.login(
+                                        LoginRequest(
+                                            username = username,
+                                            password = password
+                                        )
                                     )
-
-//                                    authViewModel.login(
-//                                        LoginRequest(
-//                                            username = username,
-//                                            password = password
-//                                        )
-//                                    )
-//                                    println("${result.token}")
+                                    println("${result.token}")
                                 },
                                 modifier = Modifier
                                     .fillMaxWidth()
